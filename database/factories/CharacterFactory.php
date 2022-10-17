@@ -13,17 +13,17 @@ class CharacterFactory extends Factory
      */
     public function definition()
     {
+        $maxHealth = $this->faker->numberBetween(50, 80);
         return [
             'name' => $this->faker->userName(),
-            'level' => $this->faker->numberBetween(1, 80),
 
+            'level' => $this->faker->numberBetween(1, 80),
             'strength' => $this->faker->numberBetween(1, 80),
             'dexterity' => $this->faker->numberBetween(1, 80),
             'magic' => $this->faker->numberBetween(1, 80),
 
-            'maxHealth' => $this->faker->numberBetween(50, 80),
-            'health' => $this->faker->numberBetween(1, 80),
-            //TODO:ITT A MAXHEALTH LEGYEN A MAX
+            'maxHealth' => $maxHealth,
+            'health' => $this->faker->numberBetween(1, $maxHealth),
 
             'gold' => $this->faker->numberBetween(100, 800),
         ];

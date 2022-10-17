@@ -1,0 +1,26 @@
+[
+   {
+      "name":"Chain Mail",
+      "equipmentType":"armor",
+      "placementType":"body",
+	  "file_path":""
+   },
+   {
+      "name":"Leather Cap",
+      "equipmentType":"armor",
+      "placementType":"head",
+	  "file_path":""
+   },
+   {
+      "name":"Leather Boots",
+      "equipmentType":"armor",
+      "placementType":"legs",
+	  "file_path":""
+   },
+   {
+      "name":"Short Sword",
+      "equipmentType":"weapon",
+      "placementType":"weapon",
+	  "file_path":""
+   }
+]

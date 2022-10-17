@@ -13,4 +13,8 @@ class Stash extends Model
     {
         return $this->belongsTo(Character::class, 'characterId');
     }
+    public function type()
+    {
+        return $this->belongsTo(Type::class);
+    }
 }

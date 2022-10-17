@@ -28,21 +28,22 @@ class CreateCharactersTable extends Migration
             $table->integer('gold');
 
             //Equipment id
-            /*$table
+
+            $table->unsignedBigInteger('headId')->nullable(true);
+            $table
                 ->foreign('headId')
                 ->references('id')
-                ->on('stash')
-                ->nullable();
+                ->on('stashes');
+            $table->unsignedBigInteger('bodyId')->nullable(true);
             $table
                 ->foreign('bodyId')
                 ->references('id')
-                ->on('stash')
-                ->nullable();
+                ->on('stashes');
+            $table->unsignedBigInteger('legsId')->nullable(true);
             $table
                 ->foreign('legsId')
                 ->references('id')
-                ->on('stash')
-                ->nullable();*/
+                ->on('stashes');
 
             $table->timestamps();
         });

@@ -16,26 +16,32 @@ class CreateStashesTable extends Migration
         Schema::create('stashes', function (Blueprint $table) {
             $table->id();
 
-            //TODO:EZT INNEN VEDD KI!
-            /*$table
-                ->foreign('type')
-                ->references('typeName')
-                ->on('types')
-                ->nullable();*/
+            $table->unsignedBigInteger('typeId');
+            $table
+                ->foreign('typeId')
+                ->references('id')
+                ->on('types');
 
-            $table->string('name', 50);
+            $table->string('name'); //This name is the prefix for the item
             $table->enum('rarity', ['normal', 'rare', 'epic', 'legendary']);
-
-            //TODO: BONUS AND NEGATIVE
 
             $table->integer('damage')->nullable();
             $table->integer('armor')->nullable();
 
-            /*$table
+            $table->integer('Bonus_S')->nullable();
+            $table->integer('Bonus_D')->nullable();
+            $table->integer('Bonus_M')->nullable();
+
+            $table->integer('Negative_S')->nullable();
+            $table->integer('Negative_D')->nullable();
+            $table->integer('Negative_M')->nullable();
+
+            $table->unsignedBigInteger('characterId');
+            $table
                 ->foreign('characterId')
                 ->references('id')
                 ->on('characters');
-*/
+
             $table->timestamps();
         });
     }

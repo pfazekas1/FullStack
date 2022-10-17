@@ -21,10 +21,11 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
 
-            /*$table
+            $table->unsignedBigInteger('characterId');
+            $table
                 ->foreign('characterId')
                 ->references('id')
-                ->on('characters');*/
+                ->on('characters');
 
             $table->rememberToken();
             $table->timestamps();
