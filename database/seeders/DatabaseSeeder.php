@@ -30,18 +30,44 @@ class DatabaseSeeder extends Seeder
                 'file_path' => $type['file_path'],
             ]);
         }
-        Character::factory(rand(10, 15))->create();
-        $characters = Character::all();
+        User::factory(rand(10, 15))->create();
+        $users = User::all();
         $typesAll = Type::all();
 
+        foreach ($users as $user) {
+            Character::factory()->create([
+                'user_id' => $user->id,
+            ]);
+        }
+
+        $characters = Character::all();
         foreach ($characters as $character) {
-            User::factory()->create([
-                'characterId' => $character->id,
-            ]);
-            Stash::factory()->create([
-                'characterId' => $character->id,
-                'typeId' => Type::inRandomOrder()->first()->id,
-            ]);
+            for ($i = 0; $i < 6; $i++) {
+                Stash::factory()->create([
+                    'character_id' => $character->id,
+                    'type_id' => Type::inRandomOrder()->first()->id,
+                ]);
+            }
+        }
+
+        foreach ($characters as $character) {
+            $items = $character->stash()->get();
+            foreach ($items as $item) {
+                switch ($item->type()->get()[0]->placementType) {
+                    case 'head':
+                        $character->update(['headId' => $item->id]);
+                        break;
+                    case 'body':
+                        $character->update(['bodyId' => $item->id]);
+                        break;
+                    case 'legs':
+                        $character->update(['legsId' => $item->id]);
+                        break;
+                    case 'weapon':
+                        $character->update(['weaponId' => $item->id]);
+                        break;
+                }
+            }
         }
     }
 }

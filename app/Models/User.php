@@ -37,6 +37,6 @@ class User extends Authenticatable
 
     public function character()
     {
-        return $this->hasOne(Character::class, 'characterId');
+        return $this->hasOne(Character::class);
     }
 }

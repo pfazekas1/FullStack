@@ -16,9 +16,9 @@ class CreateStashesTable extends Migration
         Schema::create('stashes', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('typeId');
+            $table->unsignedBigInteger('type_id');
             $table
-                ->foreign('typeId')
+                ->foreign('type_id')
                 ->references('id')
                 ->on('types');
 
@@ -36,9 +36,9 @@ class CreateStashesTable extends Migration
             $table->integer('Negative_D')->nullable();
             $table->integer('Negative_M')->nullable();
 
-            $table->unsignedBigInteger('characterId');
+            $table->unsignedBigInteger('character_id');
             $table
-                ->foreign('characterId')
+                ->foreign('character_id')
                 ->references('id')
                 ->on('characters');
 

@@ -15,6 +15,13 @@ class CreateCharactersTable extends Migration
     {
         Schema::create('characters', function (Blueprint $table) {
             $table->id();
+
+            $table->unsignedBigInteger('user_id');
+            $table
+                ->foreign('user_id')
+                ->references('id')
+                ->on('users');
+
             $table->string('name', 50);
             $table->integer('level');
 
@@ -42,6 +49,12 @@ class CreateCharactersTable extends Migration
             $table->unsignedBigInteger('legsId')->nullable(true);
             $table
                 ->foreign('legsId')
+                ->references('id')
+                ->on('stashes');
+
+            $table->unsignedBigInteger('weaponId')->nullable(true);
+            $table
+                ->foreign('weaponId')
                 ->references('id')
                 ->on('stashes');
 
