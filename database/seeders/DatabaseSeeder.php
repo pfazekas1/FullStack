@@ -30,6 +30,11 @@ class DatabaseSeeder extends Seeder
                 'file_path' => $type['file_path'],
             ]);
         }
+        User::factory()->create([
+            'name' => 'Admin',
+            'email' => 'admin@alma.com',
+            'password' => bcrypt('asd123456'),
+        ]);
         User::factory(rand(10, 15))->create();
         $users = User::all();
         $typesAll = Type::all();
