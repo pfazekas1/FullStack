@@ -28,19 +28,23 @@ class CreateStashesTable extends Migration
             $table->integer('damage')->nullable();
             $table->integer('armor')->nullable();
 
-            $table->integer('Bonus_S')->nullable();
-            $table->integer('Bonus_D')->nullable();
-            $table->integer('Bonus_M')->nullable();
+            $table->integer('bonus_s')->nullable();
+            $table->integer('bonus_d')->nullable();
+            $table->integer('bonus_m')->nullable();
 
-            $table->integer('Negative_S')->nullable();
-            $table->integer('Negative_D')->nullable();
-            $table->integer('Negative_M')->nullable();
+            $table->integer('negative_s')->nullable();
+            $table->integer('negative_d')->nullable();
+            $table->integer('negative_m')->nullable();
 
             $table->unsignedBigInteger('character_id');
             $table
                 ->foreign('character_id')
                 ->references('id')
                 ->on('characters');
+
+            $table->boolean('store_item')->default(false);
+
+            $table->integer('price');
 
             $table->timestamps();
         });

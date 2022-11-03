@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Stash extends Model
 {
     use HasFactory;
+    protected $fillable = ['character_id', 'type_id'];
 
     public function character()
     {

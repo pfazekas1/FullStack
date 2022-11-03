@@ -1,0 +1,17 @@
+[
+    {
+        "name": "Cow",
+        "key_ability": "strength",
+        "file_path": ""
+    },
+    {
+        "name": "Petty_Thief",
+        "key_ability": "dexterity",
+        "file_path": ""
+    },
+    {
+        "name": "Beholder",
+        "key_ability": "magic",
+        "file_path": ""
+    }
+]

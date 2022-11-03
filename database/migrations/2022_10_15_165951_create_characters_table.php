@@ -24,10 +24,14 @@ class CreateCharactersTable extends Migration
 
             $table->string('name', 50);
             $table->integer('level');
+            $table->integer('exp');
+            $table->integer('talent_points');
 
             $table->integer('strength');
             $table->integer('dexterity');
             $table->integer('magic');
+            $table->integer('vitality');
+            $table->integer('speed');
 
             $table->integer('health');
             $table->integer('maxHealth');
@@ -57,6 +61,8 @@ class CreateCharactersTable extends Migration
                 ->foreign('weaponId')
                 ->references('id')
                 ->on('stashes');
+
+            $table->timestamp('store_timer');
 
             $table->timestamps();
         });
