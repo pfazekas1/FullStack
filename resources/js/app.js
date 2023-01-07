@@ -12,5 +12,10 @@ require('./bootstrap');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-require('./components/Example');
-require('./components/ResponsiveDrawer')
+require('./components/NavBar');
+require('./components/Stash');
+
+require('./components/Sheet');
+require('./components/Main');
+require('./components/CharacterViewer');
+require('./components/Site');

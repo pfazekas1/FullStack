@@ -14,11 +14,7 @@ class StashFactory extends Factory
     public function definition()
     {
         $path = database_path('data/Prefixes.json');
-        $prefixes = json_decode(
-            file_get_contents($path),
-            true
-        );
-
+        $prefixes = json_decode(file_get_contents($path), true);
 
         $rarity_roll = $this->faker->numberBetween(1, 20);
         switch (true) {
@@ -34,9 +30,8 @@ class StashFactory extends Factory
             case in_array($rarity_roll, range(20, 20)): //5%
                 $rarity = 'legendary';
                 break;
-
             default:
-                $rarity = "normal";
+                $rarity = 'normal';
                 break;
         }
 
@@ -68,10 +63,14 @@ class StashFactory extends Factory
         }
 
         for ($i = 0; $i < $numberOfBonuses; $i++) {
-            $bonuses[$this->faker->numberBetween(0, 2)] += $this->faker->numberBetween(1, 10);
+            $bonuses[
+                $this->faker->numberBetween(0, 2)
+            ] += $this->faker->numberBetween(1, 10);
         }
         for ($i = 0; $i < $numberOfNegatives; $i++) {
-            $negatives[$this->faker->numberBetween(0, 2)] += $this->faker->numberBetween(1, 10);
+            $negatives[
+                $this->faker->numberBetween(0, 2)
+            ] += $this->faker->numberBetween(1, 10);
         }
 
         return [
@@ -81,13 +80,10 @@ class StashFactory extends Factory
             'damage' => $this->faker->numberBetween(1, 40),
             'armor' => $this->faker->numberBetween(1, 40),
 
-            'bonus_s' => $bonuses[0],
-            'bonus_d' => $bonuses[1],
-            'bonus_m' => $bonuses[2],
+            'bonus_s' => $bonuses[0] - $negatives[0],
+            'bonus_d' => $bonuses[1] - $negatives[1],
+            'bonus_m' => $bonuses[2] - $negatives[2],
 
-            'negative_s' => $negatives[0],
-            'negative_d' => $negatives[1],
-            'negative_m' => $negatives[2],
             'price' => $this->faker->numberBetween(0, 500),
         ];
     }

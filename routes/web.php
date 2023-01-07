@@ -14,15 +14,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('home');
-});
-
 Route::get('/testing', function () {
     return view('test');
 });
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/', function () {
+        return view('home');
+    });
+
+    Route::get('/api/csrf', [UserController::class, 'authCsrf'])->name(
+        'user.csrf'
+    );
 
     Route::get('/store', [UserController::class, 'userStore'])->name(
         'user.store'
@@ -31,9 +34,9 @@ Route::middleware(['auth'])->group(function () {
         'user.store'
     );
 
-    Route::get('/character', [UserController::class, 'userSheet'])->name(
-        'user.sheet'
-    );
+    Route::get('/character', function () {
+        return view('home');
+    });
 
     Route::put('/character', [UserController::class, 'userUpgrade'])->name(
         'user.upgrade'
@@ -42,14 +45,16 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/character', [UserController::class, 'userRespec'])->name(
         'user.respec'
     );
-
-    Route::get('/stash', [UserController::class, 'userStash'])->name(
+    Route::get('/stash', function () {
+        return view('home');
+    });
+    Route::get('/api/stash', [UserController::class, 'userStash'])->name(
         'user.stash'
     );
-    Route::patch('/stash', [UserController::class, 'userEquip'])->name(
+    Route::patch('/api/stash', [UserController::class, 'userEquip'])->name(
         'user.equip'
     );
-    Route::delete('/stash', [UserController::class, 'userSell'])->name(
+    Route::delete('/api/stash', [UserController::class, 'userSell'])->name(
         'user.sell'
     );
 
@@ -62,7 +67,3 @@ Route::middleware(['auth'])->group(function () {
 });
 
 require __DIR__ . '/auth.php';
-
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

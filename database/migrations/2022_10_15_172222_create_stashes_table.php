@@ -32,10 +32,6 @@ class CreateStashesTable extends Migration
             $table->integer('bonus_d')->nullable();
             $table->integer('bonus_m')->nullable();
 
-            $table->integer('negative_s')->nullable();
-            $table->integer('negative_d')->nullable();
-            $table->integer('negative_m')->nullable();
-
             $table->unsignedBigInteger('character_id');
             $table
                 ->foreign('character_id')
