@@ -13,10 +13,17 @@ const slice = createSlice({
         setSkip: (state, { payload: { skip } }) => {
             state.skip = skip;
         },
+        setEquipedIds: (state, { payload: { equipedIds } }) => {
+            console.log(equipedIds);
+            let tempData = state.data;
+            tempData.equipedIds = equipedIds;
+            state.data = tempData;
+            console.log(state);
+        },
     },
 });
 
-export const { setAll, setSkip } = slice.actions;
+export const { setAll, setSkip, setEquipedIds } = slice.actions;
 
 export const selectCurrentData = (state) =>
     state ? (state.stash ? state.stash.data : null) : null;

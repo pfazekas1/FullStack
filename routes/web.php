@@ -22,30 +22,29 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/', function () {
         return view('home');
     });
-
     Route::get('/api/csrf', [UserController::class, 'authCsrf'])->name(
         'user.csrf'
-    );
-
-    Route::get('/store', [UserController::class, 'userStore'])->name(
-        'user.store'
-    );
-    Route::post('/store', [UserController::class, 'userBought'])->name(
-        'user.store'
     );
 
     Route::get('/character', function () {
         return view('home');
     });
 
-    Route::put('/character', [UserController::class, 'userUpgrade'])->name(
-        'user.upgrade'
-    ); //ez csak azért, put, mert különben nem látja
 
-    Route::patch('/character', [UserController::class, 'userRespec'])->name(
-        'user.respec'
-    );
+    /*TODO: Föntiek átrendezése */
+
+
     Route::get('/stash', function () {
+        return view('home');
+    });
+    Route::get('/store', function () {
+        return view('home');
+    });
+    Route::get('/combat', function () {
+        return view('home');
+    });
+
+    Route::get('/sheet', function () {
         return view('home');
     });
     Route::get('/api/stash', [UserController::class, 'userStash'])->name(
@@ -57,11 +56,23 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/api/stash', [UserController::class, 'userSell'])->name(
         'user.sell'
     );
+    Route::get('/api/store', [UserController::class, 'userStore'])->name(
+        'user.store'
+    );
+    Route::patch('/api/store', [UserController::class, 'userBought'])->name(
+        'user.bought'
+    );
 
-    Route::get('/combat', [UserController::class, 'userMonsterGen'])->name(
+    Route::put('/api/sheet', [UserController::class, 'userUpgrade'])->name(
+        'user.upgrade'
+    );
+    Route::patch('/api/sheet', [UserController::class, 'userRespec'])->name(
+        'user.respec'
+    );
+    Route::get('/api/combat', [UserController::class, 'userMonsterGen'])->name(
         'user.combat'
     );
-    Route::patch('/combat', [UserController::class, 'userCombatGen'])->name(
+    Route::patch('/api/combat', [UserController::class, 'userCombatGen'])->name(
         'user.combatBegin'
     );
 });

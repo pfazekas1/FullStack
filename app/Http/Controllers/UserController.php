@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Arr;
 
+
+
 class UserController extends Controller
 {
     public function authCsrf()
@@ -30,13 +32,13 @@ class UserController extends Controller
             return redirect()->route('login');
         }
 
-        $skip = null; //TODO: Ha kell skip itt legyen lekérve
-        $limit = null; //TODO: Ha kell limit itt legyen lekérve
+        $skip = null; // Ha kell skip itt legyen lekérve
+        $limit = null; // Ha kell limit itt legyen lekérve
 
         $stash = Stash::where(
             'character_id',
             Auth::user()->character->id
-        )->get();
+        )->where('store_item', false)->get();
 
         $types = Type::all();
         $equiped_ids = [
@@ -48,6 +50,7 @@ class UserController extends Controller
         $character = Auth::user()->character;
 
         //return view('Stash', ['stash' => $stash, 'types' => $types, 'equiped_ids' => $equiped_ids]);
+
         $res = [
             'data' => [
                 'stash' => $stash,
@@ -61,54 +64,72 @@ class UserController extends Controller
         ];
         return response()->json($res, 200);
     }
-
     public function userStore()
     {
         if (!Auth::check()) {
-            return redirect()->route('login'); //Ha nincs belépve és kell auth_required akkor redirect
+            return redirect()->route('login');
         }
-        $character = User::findorFail(Auth::id())->character;
-        $types = Type::all(); //TODO: MAJD NE AZ ÖSSZESETT ADD TOVÁBB CSAK AMI KELL!
+
+        $skip = null; // Ha kell skip itt legyen lekérve
+        $limit = null; // Ha kell limit itt legyen lekérve
+
+        $types = Type::all();
+        $equiped_ids = [
+            Auth::user()->character->headId,
+            Auth::user()->character->bodyId,
+            Auth::user()->character->legsId,
+            Auth::user()->character->weaponId,
+        ];
+        $character = Auth::user()->character;
+
+        //return view('Stash', ['stash' => $stash, 'types' => $types, 'equiped_ids' => $equiped_ids]);
+
         $oldTimer = Carbon::parse($character->store_timer);
 
         if (Carbon::now()->gt($oldTimer->addHours(2))) {
-            Stash::factory(10)->create([
-                'character_id' => $character->id,
-                'type_id' => Arr::random($types->toArray())['id'],
-                'store_item' => true,
-            ]);
 
-            $store = Stash::where('character_id', 1)
-                ->where('store_item', true)
-                ->get();
+
+            $oldStore = Stash::where(
+                'character_id',
+                Auth::user()->character->id
+            )->where('store_item', true)->delete();
+
+
+            for ($i = 0; $i < 15; $i++) {
+                $item_level = rand(round($character->level * 0.9), $character->level);
+                while ($item_level < 1) {
+                    $item_level = rand(round($character->level * 0.9), $character->level);
+                }
+                $type = Type::inRandomOrder()->first();
+                Stash::factory()->item_level($item_level, $type->equipmentType)->create([
+                    'character_id' => $character->id,
+                    'type_id' => $type->id,
+                    'store_item' => true
+                ]);
+            }
+
             $character->store_timer = Carbon::now()->addHours(2);
 
-            //ONLY TO SHOWCASE:
-            $newTimer = $character->store_timer;
-
             $character->save();
-
-            //ONLY TO SHOWCASE:
-            return view('Store', [
-                'store' => $store,
-                'types' => $types,
-                'character' => $character,
-                'oldTimer' => $oldTimer,
-                'newTimer' => $newTimer,
-            ]);
-        } else {
-            $store = Stash::where('character_id', 1)
-                ->where('store_item', true)
-                ->get();
         }
 
-        return view('Store', [
-            'store' => $store,
-            'types' => $types,
-            'character' => $character,
-            'oldTimer' => $oldTimer,
-            'newTimer' => 0,
-        ]);
+        $stash = Stash::where(
+            'character_id',
+            Auth::user()->character->id
+        )->where('store_item', true)->get();
+
+        $res = [
+            'data' => [
+                'stash' => $stash,
+                'types' => $types,
+                'equiped_ids' => $equiped_ids,
+                'character' => $character,
+            ],
+            'total' => $stash->count(),
+            'skip' => $skip,
+            'limit' => $limit,
+        ];
+        return response()->json($res, 200);
     }
     public function userBought(Request $request)
     {
@@ -116,23 +137,21 @@ class UserController extends Controller
             return redirect()->route('login'); //Ha nincs belépve és kell auth_required akkor redirect
         }
 
-        $id = $request->post()['id'];
-        $user = Auth::id();
+        $id = $request->header('id');
         $character = Auth::user()->character;
-        //var_dump($data);
 
         $bought_item = Stash::findorFail($id);
+        if ($bought_item->store_item) {
+            if ($bought_item->price <= $character->gold) {
+                $character->gold = $character->gold - $bought_item->price;
 
-        if ($bought_item->price <= $character->gold) {
-            $character->gold = $character->gold - $bought_item->price;
-
-            $bought_item->store_item = false;
-            $bought_item->save();
-            $character->save();
-        } else {
-            //TODO: KÜLDJ VISSZA ERRORT, HOGY NEM VOLT ELÉG PÉNZED!
+                $bought_item->store_item = false;
+                $bought_item->save();
+                $character->save();
+            }
         }
-        return redirect('/store');
+
+        return $this->userStore();
     }
     public function userSheet()
     {
@@ -147,20 +166,20 @@ class UserController extends Controller
 
         $items['head'] =
             Stash::find($character->headId) == null
-                ? null
-                : Stash::find($character->headId);
+            ? null
+            : Stash::find($character->headId);
         $items['body'] =
             Stash::find($character->bodyId) == null
-                ? null
-                : Stash::find($character->bodyId);
+            ? null
+            : Stash::find($character->bodyId);
         $items['legs'] =
             Stash::find($character->legsId) == null
-                ? null
-                : Stash::find($character->legsId);
+            ? null
+            : Stash::find($character->legsId);
         $items['weapon'] =
             Stash::find($character->weaponId) == null
-                ? null
-                : Stash::find($character->weaponId);
+            ? null
+            : Stash::find($character->weaponId);
 
         return view('Sheet', [
             'character' => $character,
@@ -170,42 +189,47 @@ class UserController extends Controller
     }
     public function userUpgrade(Request $request)
     {
-        $data = $request->all();
-        $upgrade_type = $data['type'];
+
+        $upgrade_type = $request->header('stat');
 
         if (!Auth::check()) {
             return redirect()->route('login'); //Ha nincs belépve és kell auth_required akkor redirect
         }
 
         $character = Auth::user()->character;
-        $character->talent_points -= 1;
 
-        switch ($upgrade_type) {
-            case 'str':
-                $character->strength += 1;
-                break;
-            case 'dex':
-                $character->dexterity += 1;
-                break;
-            case 'mag':
-                $character->magic += 1;
-                break;
-            case 'vit':
-                $character->vitality += 1;
-                break;
-            case 'spe':
-                $character->speed += 1;
-                break;
-            default:
-                //TODO: ERRORT DOB ILYENKOR
-                break;
+        if ($character->talent_points > 0) {
+            switch ($upgrade_type) {
+                case 'strength':
+                    $character->talent_points -= 1;
+                    $character->strength += 1;
+                    break;
+                case 'dexterity':
+                    $character->talent_points -= 1;
+                    $character->dexterity += 1;
+                    break;
+                case 'magic':
+                    $character->talent_points -= 1;
+                    $character->magic += 1;
+                    break;
+                case 'vitality':
+                    $character->talent_points -= 1;
+                    $character->vitality += 1;
+                    $character->maxHealth = $this->hpCalc($character->level, $character->vitality);
+                    break;
+                case 'speed':
+                    $character->talent_points -= 1;
+                    $character->speed += 1;
+                    break;
+                default:
+                    //TODO: ERRORT DOB ILYENKOR
+                    break;
+            }
         }
-
-        $character->maxHealth = $character->level * (10 + $character->vitality);
 
         $character->save();
 
-        return redirect()->route('user.sheet');
+        return $this->userStash();
     }
     public function userRespec()
     {
@@ -222,15 +246,29 @@ class UserController extends Controller
         $character->vitality = 10;
         $character->speed = 10;
 
-        $character->gold = $character->gold - $character->level * 100 * 1.35;
-        $character->maxHealth = $character->level * (10 + $character->vitality);
-        if ($character->health > $character->maxHealth) {
-            $character->health = $character->maxHealth;
-        }
+        $character->gold = $character->gold - round($character->level * 100 * 1.35);
+        $character->maxHealth = $this->hpCalc($character->level, $character->vitality);
 
         $character->save();
 
-        return redirect()->route('user.sheet');
+        return $this->userStash();
+    }
+    public function userRename(Request $request)
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login'); //Ha nincs belépve és kell auth_required akkor redirect
+        }
+
+        $character = Auth::user()->character;
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+        var_dump($validated);
+
+        $character->save();
+
+        return $this->userStash();
     }
 
     public function userEquip(Request $request)
@@ -239,26 +277,26 @@ class UserController extends Controller
             return redirect()->route('login'); //Ha nincs belépve és kell auth_required akkor redirect
         }
 
-        $data = $request->all();
-        var_dump($data);
+        //var_dump($data);
 
-        $type = $data['placementType'];
+        $type = $request->header('placementType');
         $character = Character::findorFail(Auth::id());
-        $unequip = filter_var($data['unequip'], FILTER_VALIDATE_BOOLEAN);
+        $unequip = filter_var($request->header('unequip'), FILTER_VALIDATE_BOOLEAN);
+        $id = $request->header('id');
 
         if (!$unequip) {
             switch ($type) {
                 case 'head':
-                    $character->headId = $data['id'];
+                    $character->headId = $id;
                     break;
                 case 'body':
-                    $character->bodyId = $data['id'];
+                    $character->bodyId = $id;
                     break;
                 case 'legs':
-                    $character->legsId = $data['id'];
+                    $character->legsId = $id;
                     break;
                 case 'weapon':
-                    $character->weaponId = $data['id'];
+                    $character->weaponId = $id;
                     break;
                 default:
                     //TODO: ERROR CHECK IDE
@@ -286,7 +324,14 @@ class UserController extends Controller
 
         $character->save();
 
-        return redirect('/stash');
+        $equiped_ids = [
+            Auth::user()->character->headId,
+            Auth::user()->character->bodyId,
+            Auth::user()->character->legsId,
+            Auth::user()->character->weaponId,
+        ];
+
+        return $this->userStash();
     }
 
     public function userSell(Request $request)
@@ -295,11 +340,11 @@ class UserController extends Controller
             return redirect()->route('login'); //Ha nincs belépve és kell auth_required akkor redirect
         }
 
-        $id = $request->post()['id'];
+        $id = $request->header('id');
 
         $character = Auth::user()->character;
         $unequip = filter_var(
-            $request->post()['unequip'],
+            $request->header('unequip'),
             FILTER_VALIDATE_BOOLEAN
         );
 
@@ -325,12 +370,12 @@ class UserController extends Controller
             }
         }
 
-        $character->gold = $character->gold + $item->price;
+        $character->gold += $item->price;
 
         $character->save();
         $item->delete();
 
-        return response()->json($request->post(), 200);
+        return $this->userStash();
     }
 
     public function userMonsterGen()
@@ -347,36 +392,25 @@ class UserController extends Controller
             $level = rand($character->level - 5, $character->level + 5);
             $stats = [10, 10, 10, 10, 10];
 
-            switch ($template['key_ability']) {
-                case 'strength':
-                    $key_ability_index = 0;
-                    break;
-                case 'dexterity':
-                    $key_ability_index = 1;
-                    break;
-                case 'magic':
-                    $key_ability_index = 2;
-                    break;
-                default:
-                    break;
-            }
+            $key_ability_index = $this->keyStat($template['key_ability']);
 
             for ($p = 0; $p < $level - 1; $p++) {
                 switch (rand(0, 6)) {
+                        //Random statokat rollolunk. 14% mindennek kivéve a key-nek annak 14%*3 a chance, hogy kap
                     case 0:
-                        $stats[0] += 1;
+                        $stats[0] += 1; //str
                         break;
                     case 1:
-                        $stats[1] += 1;
+                        $stats[1] += 1; //dex
                         break;
                     case 2:
-                        $stats[2] += 1;
+                        $stats[2] += 1; //mag
                         break;
                     case 3:
-                        $stats[3] += 1;
+                        $stats[3] += 1; //vit
                         break;
                     case 4:
-                        $stats[4] += 1;
+                        $stats[4] += 1; //speed
                         break;
                     default:
                         $stats[$key_ability_index] += 1;
@@ -384,9 +418,22 @@ class UserController extends Controller
                 }
             }
 
+
+            $health = 200;
+            $bonus = 10;
+            /*Hp scaling calculation*/
+            //10 hp bonus per level
+            //Increases by 1.5 every 10 levels
+            for ($h = 1; $h < $level; $h++) {
+                if ($h % 10 == 0) {
+                    $bonus = round($bonus * 1.5);
+                }
+                $health = $health + $bonus;
+            }
+
             $monsters[] = (object) [
                 'name' => $template['name'],
-                'key_ability' => $template['key_ability'],
+                'key_ability_index' => $key_ability_index,
                 'level' => $level,
 
                 'strength' => $stats[0],
@@ -395,12 +442,17 @@ class UserController extends Controller
                 'vitality' => $stats[3],
                 'speed' => $stats[4],
 
-                'hp' => $stats[3] * 10 * $level,
-                'defense' => round($stats[1] * 1.15 + $stats[3] * 1.5),
+                'damage' => floor(floor($level / 5) + 3 * (1.4 * $stats[$key_ability_index])),
+                //Warning: Enemynek elég akkor csak majd a damage variance, hogy meglegyen a végső damage
+
+                'hp' => $health,
             ];
         }
 
-        return view('Combat', ['monsters' => $monsters]);
+        //return view('Combat', ['monsters' => $monsters]);
+
+
+        return response()->json(['monsters' => $monsters], 200);
     }
 
     public function userCombatGen(Request $request)
@@ -408,95 +460,190 @@ class UserController extends Controller
         if (!Auth::check()) {
             return redirect()->route('login'); //Ha nincs belépve és kell auth_required akkor redirect
         }
-        $data = $request->all();
-        $monster = json_decode($data['monsterData']);
+        $monster = json_decode($request->header('monsterData'), true);
+        //Szörnynek minden fontos adata
+
+
+        /*Karakter adatainak összeszedése */
         $character = Auth::user()->character;
 
+        /*Armor és weapon piecek lekérdezése a stashből*/
         $head = Stash::find($character->headId);
         $body = Stash::find($character->bodyId);
         $legs = Stash::find($character->legsId);
         $weapon = Stash::find($character->weaponId);
 
-        $turn = 1;
-
-        //var_dump($monster);
-        $monster = (array) $monster;
-        $monster['maxHP'] = $monster['hp'];
-
+        /*Player armor ratingje*/
         $player_armor =
             ($character->headId != null ? $head->armor : 0) +
             ($character->bodyId != null ? $body->armor : 0) +
             ($character->legsId != null ? $legs->armor : 0);
 
+        /*Csak ezek a statok kapnak bonusokat, de lehetne a többinek is*/
         $player_stats = [
             $character->strength +
-            ($character->headId != null ? $head->bonus_s : 0) +
-            ($character->headId != null ? $head->negative_s : 0) +
-            ($character->bodyId != null ? $body->bonus_s : 0) +
-            ($character->bodyId != null ? $body->negative_s : 0) +
-            ($character->legsId != null ? $legs->bonus_s : 0) +
-            ($character->legsId != null ? $legs->negative_s : 0),
+                ($character->headId != null ? $head->bonus_s : 0)  +
+                ($character->bodyId != null ? $body->bonus_s : 0) +
+                ($character->legsId != null ? $legs->bonus_s : 0),
             $character->dexterity +
-            ($character->headId != null ? $head->bonus_d : 0) +
-            ($character->headId != null ? $head->negative_d : 0) +
-            ($character->bodyId != null ? $body->bonus_d : 0) +
-            ($character->bodyId != null ? $body->negative_d : 0) +
-            ($character->legsId != null ? $legs->bonus_d : 0) +
-            ($character->legsId != null ? $legs->negative_d : 0),
+                ($character->headId != null ? $head->bonus_d : 0)  +
+                ($character->bodyId != null ? $body->bonus_d : 0)  +
+                ($character->legsId != null ? $legs->bonus_d : 0),
             $character->magic +
-            ($character->headId != null ? $head->bonus_m : 0) +
-            ($character->headId != null ? $head->negative_m : 0) +
-            ($character->bodyId != null ? $body->bonus_m : 0) +
-            ($character->bodyId != null ? $body->negative_m : 0) +
-            ($character->legsId != null ? $legs->bonus_m : 0) +
-            ($character->legsId != null ? $legs->negative_m : 0),
+                ($character->headId != null ? $head->bonus_m : 0)  +
+                ($character->bodyId != null ? $body->bonus_m : 0)  +
+                ($character->legsId != null ? $legs->bonus_m : 0),
             $character->vitality,
             $character->speed,
         ];
+        $player_key_ability_index = $this->keyStat($weapon ? $weapon->type->key_ability : null);
 
+        $monster['maxHp'] = $monster['hp'];
+        $player = array(
+            'name' => $character->name,
+            'level' => $character->level,
+            'key_ability_index' => $player_key_ability_index,
+
+            'strength' => $player_stats[0],
+            'dexterity' => $player_stats[1],
+            'magic' => $player_stats[2],
+            'vitality' => $player_stats[3],
+            'speed' => $player_stats[4],
+
+            'damage' => floor(($weapon ? $weapon->damage : 1) * (1.4 * $player_stats[$player_key_ability_index])),
+            'armor' => $player_armor,
+
+            'hp' => $character->maxHealth,
+            'maxHp' => $character->maxHealth,
+        );
+        $turn = 1;
         $won = '';
-        while ($character->health > 0 && $monster['hp'] > 0) {
-            if ($player_stats[4] > $monster['speed']) {
-                $monster['hp'] -= $weapon->damage;
 
-                if ($monster['hp'] <= 0 && $won != 'monster') {
-                    $won = 'player';
+        $calcHpPlayer = $character->maxHealth;
+        $calcHpMonster = $monster['maxHp'];
+
+        while ($calcHpPlayer > 0 && $calcHpMonster > 0) {
+            if ($player['speed'] >= $monster['speed']) {
+                $results[$turn]['player'] = $this->attack($player, $monster, 1);
+                $results[$turn]['turn_order'] = 'player';
+
+                $calcHpMonster = $calcHpMonster - $results[$turn]['player']['damage'];
+                if ($calcHpMonster <= 0) {
+                    $results['won'] = 'player';
+                    break;
                 }
-                $character->health -= floor(
-                    $monster[$monster['key_ability']] + $monster['level']
-                );
 
-                if ($character->health <= 0 && $won != 'player') {
-                    $won = 'monster';
+                $results[$turn]['monster'] = $this->attack($monster, $player, (1 - (($player['armor'] / 4) / 100))); //80 armornál van 20% dr
+
+                $calcHpPlayer = $calcHpPlayer - $results[$turn]['monster']['damage'];
+                if ($calcHpPlayer <= 0) {
+                    $results['won'] = 'monster';
+                    break;
                 }
-                $results[$turn]['player_hp'] = $character->health;
-                $results[$turn]['monster_hp'] = $monster['hp'];
-
                 $turn += 1;
             } else {
-                $character->health -=
-                    $monster[$monster['key_ability']] + 1.5 * $monster['level'];
+                $results[$turn]['monster'] = $this->attack($monster, $player, (1 - (($player['armor'] / 4) / 100)));
+                $results[$turn]['turn_order'] = 'monster';
 
-                if ($character->health <= 0 && $won != 'player') {
-                    $won = 'monster';
+                $calcHpPlayer = $calcHpPlayer - $results[$turn]['monster']['damage'];
+                if ($calcHpPlayer <= 0) {
+                    $results['won'] = 'monster';
+                    break;
                 }
-                $monster['hp'] -= $weapon->damage;
 
-                if ($monster['hp'] <= 0 && $won != 'monster') {
-                    $won = 'player';
+                $results[$turn]['player'] = $this->attack($player, $monster, 1);
+
+                $calcHpMonster = $calcHpMonster - $results[$turn]['player']['damage'];
+                if ($calcHpMonster <= 0) {
+                    $results['won'] = 'player';
+                    break;
                 }
-                $results[$turn]['player_hp'] = $character->health;
-                $results[$turn]['monster_hp'] = $monster['hp'];
-
                 $turn += 1;
             }
         }
-        $results['won'] = $won;
 
-        //TODO: DAMAGE ÁTADÁSA
-        //TODO: HP-> elmentése a playeren
-        //TODO: reward generálása
+        $results['player_data'] = $player;
+        $results['monster_data'] = $monster;
+        $results['turn_count'] = $turn;
 
-        return view('Combat', ['results' => $results]);
+        return response()->json(['combat_data' => $results], 200);
+    }
+    public function attack($attacker,$attacked, $damageReduction)
+    {
+        $toHit_attacked = rand(0, 100);
+        $toHit_attacker = rand(0, 100);
+
+        switch (true) {
+            case ($toHit_attacker > "98"): //CRIT! 2% chance
+                return
+                    array(
+                        'damage' => round(rand($attacker['damage'] * 0.8, $attacker['damage'] * 1.2) * $damageReduction) * 2,
+                        'crit' => true,
+                        'miss' => false,
+                    );
+            case ($toHit_attacker  >= $toHit_attacked): //regular hit 
+                return
+                    array(
+                        'damage' => round(rand($attacker['damage'] * 0.8, $attacker['damage'] * 1.2) * $damageReduction),
+                        'crit' => false,
+                        'miss' => false,
+                    );
+            case ($toHit_attacker == 0): //Critical Failure!
+                return
+                    array(
+                        'damage' => 0,
+                        'crit' => true,
+                        'miss' => true,
+                    );
+            default: //miss
+                return
+                    array(
+                        'damage' => 0,
+                        'crit' => false,
+                        'miss' => true,
+                    );
+        }
+        return 0;
+    }
+    public function keyStat($k_a)
+    {
+        switch ($k_a) {
+            case 'strength':
+                return 0;
+                break;
+            case 'dexterity':
+                return 1;
+                break;
+            case 'magic':
+                return 2;
+                break;
+            default:
+                return 0; //Ha nincs fegyvered akkor ökölel ütsz és az strengthből scalel
+                break;
+        }
+    }
+
+    public function hpCalc($level, $vitality)
+    {
+        $maxHealth = 200;
+        $bonus = 10;
+        $vit_bonus = 10;
+        $vit_health = 0;
+        for ($h = 1; $h < $level; $h++) {
+            if ($h % 10 == 0) {
+                $bonus = round($bonus * 1.5);
+            }
+            $maxHealth = $maxHealth + $bonus;
+        }
+        for ($v = 0; $v < $vitality; $v++) {
+            $vit_health = $vit_health + $vit_bonus;
+            if ($v < 40) {
+                $vit_bonus = round($vit_bonus * 1.02);
+            } else {
+                $vit_bonus = round($vit_bonus * 0.9);
+            }
+        }
+
+        return ($maxHealth + $vit_health);
     }
 }

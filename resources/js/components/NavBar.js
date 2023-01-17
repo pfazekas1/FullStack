@@ -38,9 +38,9 @@ const NavBar = ({ csrf }) => {
 
                 <Stack direction='row' spacing={2}>
                     <Button color='inherit' onClick={() => navigateTo('/stash')}>Stash</Button>
-                    <Button color='inherit'>Store</Button>
-                    <Button color='inherit'>Combat</Button>
-                    <Button color='inherit'>Character</Button>
+                    <Button color='inherit'onClick={() => navigateTo('/store')}>Store</Button>
+                    <Button color='inherit'onClick={() => navigateTo('/combat')}>Combat</Button>
+                    <Button color='inherit'onClick={() => navigateTo('/sheet')}>Character</Button>
                     <Button color='inherit' onClick={logout} >Logout</Button>
                 </Stack>
             </Toolbar >

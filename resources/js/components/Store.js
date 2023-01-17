@@ -28,14 +28,10 @@ import { useEffect, useState } from "react";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import CharacterViewer from "./CharacterViewer";
 import { selectCurrentData, setAll } from "../storage/stashSlice";
-import {
-    useEquipOneMutation,
-    useGetAllMutation,
-    useSellOneMutation,
-} from "../storage/stashApiSlice";
+import { useBuyOneMutation, useGetStoreMutation } from "../storage/stashApiSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-const Stash = ({ csrf }) => {
+const Store = ({ csrf }) => {
     /*const [character, setCharacter] = useState(null);
     const [types, setTypes] = useState(null);
     const [equiped_ids, setEquiped_ids] = useState(null);*/
@@ -43,11 +39,10 @@ const Stash = ({ csrf }) => {
     const [temp, setTemp] = useState(false);
     const [spinner, setSpinner] = useState(false);
 
-    /*Handling the stash api */
+    /*Handling the Store api */
     const data = useSelector(selectCurrentData);
-    const [getAll] = useGetAllMutation();
-    const [sellOne] = useSellOneMutation();
-    const [equipOne] = useEquipOneMutation();
+    const [getStore] = useGetStoreMutation();
+    const [buyOne] = useBuyOneMutation();
     const dispatch = useDispatch();
 
     const [anchorEl, setAnchorEl] = useState(null);
@@ -82,7 +77,7 @@ const Stash = ({ csrf }) => {
     };
 
     //TODO:Kicsit taxing lehet, meg kell nézni nagyobb datasettel
-    const filterStash = () => {
+    const filterStore = () => {
         let tempStash = [...data.stash];
 
         //Tab filtering
@@ -177,7 +172,7 @@ const Stash = ({ csrf }) => {
     async function load() {
         setSpinner(true);
         try {
-            const result = await getAll();
+            const result = await getStore();
             //console.log(result.data);
             if (result.data) {
                 dispatch(setAll(result.data));
@@ -191,37 +186,16 @@ const Stash = ({ csrf }) => {
 
     useEffect(() => {
         load();
-    }, [dispatch, getAll]);
+    }, [dispatch, getStore]);
 
-    async function equip(id, unequip, placementType) {
+    async function buyItem(id) {
         setSpinner(true);
         try {
             let headers = {
-                unequip: unequip,
-                id: id,
-                placementType: placementType,
-                "X-CSRF-Token": csrf,
-            };
-            const result = await equipOne(headers);
-            //console.log(result.data);
-            if (result.data) {
-                dispatch(setAll(result.data));
-            }
-        } catch (err) {
-            console.log(err);
-        } finally {
-            setSpinner(false);
-        }
-    }
-    async function sell(id, unequip) {
-        setSpinner(true);
-        try {
-            let headers = {
-                unequip: unequip,
                 id: id,
                 "X-CSRF-Token": csrf,
             };
-            const result = await sellOne(headers);
+            const result = await buyOne(headers);
             console.log(result.data);
             if (result.data) {
                 dispatch(setAll(result.data));
@@ -263,8 +237,8 @@ const Stash = ({ csrf }) => {
                                     alignItems="center"
                                     spacing={5}
                                 >
-                                    {filterStash().map((i, index) => {
-                                        if (i.store_item != "1")
+                                    {filterStore().map((i, index) => {
+                                        if (i.store_item != "0")
                                             return (
                                                 <Card
                                                     key={index}
@@ -363,59 +337,13 @@ const Stash = ({ csrf }) => {
                                                         <Button
                                                             size="small"
                                                             onClick={() =>
-                                                                sell(
-                                                                    i.id,
-                                                                    data.equiped_ids.indexOf(
-                                                                        i.id
-                                                                    ) != -1
+                                                                buyItem(
+                                                                    i.id
                                                                 )
                                                             }
                                                         >
-                                                            Sell
+                                                            Buy
                                                         </Button>
-                                                        {data.equiped_ids.indexOf(
-                                                            i.id
-                                                        ) != -1 ? (
-                                                            <Button
-                                                                size="small"
-                                                                onClick={() =>
-                                                                    equip(
-                                                                        i.id,
-                                                                        data.equiped_ids.indexOf(
-                                                                            i.id
-                                                                        ) != -1,
-                                                                        data
-                                                                            .types[
-                                                                            i.type_id -
-                                                                                1
-                                                                        ]
-                                                                            .placementType
-                                                                    )
-                                                                }
-                                                            >
-                                                                Unequip
-                                                            </Button>
-                                                        ) : (
-                                                            <Button
-                                                                size="small"
-                                                                onClick={() =>
-                                                                    equip(
-                                                                        i.id,
-                                                                        data.equiped_ids.indexOf(
-                                                                            i.id
-                                                                        ) != -1,
-                                                                        data
-                                                                            .types[
-                                                                            i.type_id -
-                                                                                1
-                                                                        ]
-                                                                            .placementType
-                                                                    )
-                                                                }
-                                                            >
-                                                                Equip
-                                                            </Button>
-                                                        )}
                                                     </CardActions>
                                                 </Card>
                                             );
@@ -568,4 +496,4 @@ const Stash = ({ csrf }) => {
     );
 };
 
-export default Stash;
+export default Store;

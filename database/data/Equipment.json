@@ -1,26 +1,30 @@
 [
-   {
-      "name":"Chain Mail",
-      "equipmentType":"armor",
-      "placementType":"body",
-	  "file_path":""
-   },
-   {
-      "name":"Leather Cap",
-      "equipmentType":"armor",
-      "placementType":"head",
-	  "file_path":""
-   },
-   {
-      "name":"Leather Boots",
-      "equipmentType":"armor",
-      "placementType":"legs",
-	  "file_path":""
-   },
-   {
-      "name":"Short Sword",
-      "equipmentType":"weapon",
-      "placementType":"weapon",
-	  "file_path":""
-   }
+    {
+        "name": "Chain Mail",
+        "equipmentType": "armor",
+        "placementType": "body",
+        "key_ability": "",
+        "file_path": ""
+    },
+    {
+        "name": "Leather Cap",
+        "equipmentType": "armor",
+        "placementType": "head",
+        "key_ability": "",
+        "file_path": ""
+    },
+    {
+        "name": "Leather Boots",
+        "equipmentType": "armor",
+        "placementType": "legs",
+        "key_ability": "",
+        "file_path": ""
+    },
+    {
+        "name": "Short Sword",
+        "equipmentType": "weapon",
+        "placementType": "weapon",
+        "key_ability": "strength",
+        "file_path": ""
+    }
 ]

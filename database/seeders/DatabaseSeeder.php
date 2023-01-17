@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
                 'name' => $type['name'],
                 'equipmentType' => $type['equipmentType'],
                 'placementType' => $type['placementType'],
+                'key_ability' => $type['key_ability'] != '' ? $type['key_ability'] : null,
                 'file_path' => $type['file_path'],
             ]);
         }
@@ -66,15 +67,25 @@ class DatabaseSeeder extends Seeder
         $characters = Character::all();
         foreach ($characters as $character) {
             for ($i = 0; $i < 6; $i++) {
-                Stash::factory()->create([
+                $item_level = rand(round($character->level * 0.9), $character->level);
+                while ($item_level < 1) {
+                    $item_level = rand(round($character->level * 0.9), $character->level);
+                }
+                $type = Type::inRandomOrder()->first();
+                Stash::factory()->item_level($item_level, $type->equipmentType)->create([
                     'character_id' => $character->id,
-                    'type_id' => Type::inRandomOrder()->first()->id,
+                    'type_id' => $type->id
                 ]);
             }
             for ($i = 0; $i < 10; $i++) {
-                Stash::factory()->create([
+                $item_level = rand(round($character->level * 0.9), $character->level);
+                while ($item_level < 1) {
+                    $item_level = rand(round($character->level * 0.9), $character->level);
+                }
+                $type = Type::inRandomOrder()->first();
+                Stash::factory()->item_level($item_level, $type->equipmentType)->create([
                     'character_id' => $character->id,
-                    'type_id' => Type::inRandomOrder()->first()->id,
+                    'type_id' => $type->id,
                     "store_item" => true,
                 ]);
             }

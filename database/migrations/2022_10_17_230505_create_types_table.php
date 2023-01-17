@@ -18,6 +18,7 @@ class CreateTypesTable extends Migration
             $table->string('name')->unique();
             $table->enum('equipmentType', ['weapon', 'armor']);
             $table->enum('placementType', ['weapon', 'head', 'body', 'legs']);
+            $table->enum('key_ability', ['strength', 'magic', 'dexterity'])->nullable();
             $table->string('file_path');
             $table->timestamps();
         });

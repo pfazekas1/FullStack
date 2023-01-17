@@ -15,6 +15,7 @@ class CreateStashesTable extends Migration
     {
         Schema::create('stashes', function (Blueprint $table) {
             $table->id();
+            $table->integer('item_level');
 
             $table->unsignedBigInteger('type_id');
             $table
