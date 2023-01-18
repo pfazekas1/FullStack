@@ -21,7 +21,7 @@ steps:
     docker push pfazekas1/$(projectName):$(version)
     docker push pfazekas1/$(projectName):latest
   displayName: 'Docker push'
-  - powershell: |
+- powershell: |
     $file = "version"
     $fileVersion = (Get-Content $file | Select -First 1).Split(".")
     $fileVersion[2] = [int]$fileVersion[2] + 1
