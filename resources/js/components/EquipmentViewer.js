@@ -10,7 +10,6 @@ import {
     Paper,
     Typography,
 } from "@mui/material";
-import { margin } from "@mui/system";
 import "bootstrap/dist/css/bootstrap.css";
 import { styled } from "@mui/material/styles";
 import * as React from "react";
@@ -54,7 +53,7 @@ const EquipmentViewer = ({
                             <CardMedia
                                 component="img"
                                 height="140"
-                                image="IMAGE"
+                                image={types[i.type_id - 1].file_path}
                                 alt={types[i.type_id - 1].name}
                             />
                             <CardContent>
@@ -108,7 +107,7 @@ const EquipmentViewer = ({
                     <Avatar
                         variant="square"
                         sx={{ margin: "16px" }}
-                        src="https://pngimg.com/uploads/sword/sword_PNG5525.png"
+                        src={types[i.type_id - 1].file_path}
                     />
                 </Paper>
             </HtmlTooltip>

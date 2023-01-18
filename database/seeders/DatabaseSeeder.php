@@ -34,14 +34,14 @@ class DatabaseSeeder extends Seeder
                 'equipmentType' => $type['equipmentType'],
                 'placementType' => $type['placementType'],
                 'key_ability' => $type['key_ability'] != '' ? $type['key_ability'] : null,
-                'file_path' => $type['file_path'],
+                'file_path' => "images/" . $type['file_path'],
             ]);
         }
         foreach ($monster_data as $key => $data) {
             Monster::create([
                 'name' => $data['name'],
                 'key_ability' => $data['key_ability'],
-                'file_path' => $data['file_path'],
+                'file_path' => "images/" . $data['file_path'],
             ]);
         }
 

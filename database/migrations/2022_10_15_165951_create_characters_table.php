@@ -64,6 +64,13 @@ class CreateCharactersTable extends Migration
 
             $table->timestamp('store_timer');
 
+            /* Accomplishments */
+
+
+            $table->integer('totalGold')->default(0);
+            $table->integer('totalBattles')->default(0);
+            $table->integer('totalBattlesWon')->default(0);
+
             $table->timestamps();
         });
     }

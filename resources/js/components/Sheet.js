@@ -36,8 +36,8 @@ const Sheet = ({ csrf }) => {
     const [respecAll] = useRespecAllMutation();
     const dispatch = useDispatch();
 
-    const [attackChange, setAttackChange] = useState(false);
-    const [healthChange, setHealthChange] = useState(false);
+    const [attackChange, setAttackChange] = useState();
+    const [healthChange, setHealthChange] = useState();
 
     console.log(data);
 
@@ -55,19 +55,21 @@ const Sheet = ({ csrf }) => {
                         if (
                             ["strength", "dexterity", "magic"].includes(statMod)
                         ) {
-                            let weapon =
-                                data.stash[
-                                    stashSearch(data.character.weaponId)
-                                ];
+                            if (stashSearch(data.character.weaponId) != -1) {
+                                let weapon =
+                                    data.stash[
+                                        stashSearch(data.character.weaponId)
+                                    ];
 
-                            let type =
-                                data.types[
-                                    data.types.findIndex((el) => {
-                                        return el.id == weapon.type_id;
-                                    })
-                                ];
-                            if (type.key_ability == statMod) {
-                                setAttackChange(true);
+                                let type =
+                                    data.types[
+                                        data.types.findIndex((el) => {
+                                            return el.id == weapon.type_id;
+                                        })
+                                    ];
+                                if (type.key_ability == statMod) {
+                                    setAttackChange(true);
+                                }
                             }
                         }
                     }}
@@ -157,7 +159,7 @@ const Sheet = ({ csrf }) => {
             legs = data.stash[stashSearch(data.equiped_ids[2])];
 
         return (
-            (head ? head.armor : 0)+
+            (head ? head.armor : 0) +
             (body ? body.armor : 0) +
             (legs ? legs.armor : 0)
         );
@@ -243,9 +245,9 @@ const Sheet = ({ csrf }) => {
             sx={{ mt: "16px" }}
             spacing={2}
         >
-            <Grid item xs={4} className="sketchy">
+            <Grid item xs={4}>
                 {data ? (
-                    <List>
+                    <List className="sketchy">
                         <ListItem>
                             <ListItemAvatar>
                                 <Avatar>
@@ -474,7 +476,37 @@ const Sheet = ({ csrf }) => {
                             </AccordionSummary>
                             <AccordionDetails>
                                 <ListItem>
-                                    <ListItemText primary={"Kills: " + 200} />
+                                    <ListItemText
+                                        primary={
+                                            "Total gold earned: " +
+                                            data.character.totalGold
+                                        }
+                                    />
+                                </ListItem>
+                                <ListItem>
+                                    <ListItemText
+                                        primary={
+                                            "Battles fought: " +
+                                            data.character.totalBattles
+                                        }
+                                    />
+                                </ListItem>
+                                <ListItem>
+                                    <ListItemText
+                                        primary={
+                                            "Battles Won: " +
+                                            data.character.totalBattlesWon +
+                                            " (" +
+                                            Math.round(
+                                                (data.character
+                                                    .totalBattlesWon /
+                                                    data.character
+                                                        .totalBattles) *
+                                                    100
+                                            ) +
+                                            "%)"
+                                        }
+                                    />
                                 </ListItem>
                             </AccordionDetails>
                         </Accordion>

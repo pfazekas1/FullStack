@@ -28,13 +28,17 @@ import { useEffect, useState } from "react";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import CharacterViewer from "./CharacterViewer";
 import { selectCurrentData, setAll } from "../storage/stashSlice";
-import { useBuyOneMutation, useGetStoreMutation } from "../storage/stashApiSlice";
+import {
+    useBuyOneMutation,
+    useGetStoreMutation,
+} from "../storage/stashApiSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 const Store = ({ csrf }) => {
-    /*const [character, setCharacter] = useState(null);
-    const [types, setTypes] = useState(null);
-    const [equiped_ids, setEquiped_ids] = useState(null);*/
+    /*Timer component */
+    const [time, setTime] = useState();
+
+    /*Stat display */
     const [temp_e_ids, setTemp_e_ids] = useState([null, null, null, null]);
     const [temp, setTemp] = useState(false);
     const [spinner, setSpinner] = useState(false);
@@ -271,7 +275,11 @@ const Store = ({ csrf }) => {
                                                     <CardMedia
                                                         component="img"
                                                         height="140"
-                                                        image="IMAGE"
+                                                        image={
+                                                            data.types[
+                                                                i.type_id - 1
+                                                            ].file_path
+                                                        }
                                                         alt={
                                                             data.types[
                                                                 i.type_id - 1
@@ -337,9 +345,7 @@ const Store = ({ csrf }) => {
                                                         <Button
                                                             size="small"
                                                             onClick={() =>
-                                                                buyItem(
-                                                                    i.id
-                                                                )
+                                                                buyItem(i.id)
                                                             }
                                                         >
                                                             Buy
@@ -360,6 +366,7 @@ const Store = ({ csrf }) => {
                                         equiped_ids={data.equiped_ids}
                                         temp_e_ids={temp_e_ids}
                                         temp={temp}
+                                        types={data.types}
                                     />
                                     <IconButton
                                         size="large"
@@ -484,6 +491,12 @@ const Store = ({ csrf }) => {
                                             </Stack>
                                         </Paper>
                                     </Popover>
+                                    <Typography>
+                                        {"Store refreshes at: " +
+                                            new Date(
+                                                data.character.store_timer
+                                            ).toLocaleString()}
+                                    </Typography>
                                 </div>
                             </Grid>
                         </Grid>

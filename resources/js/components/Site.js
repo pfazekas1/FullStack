@@ -11,6 +11,7 @@ import Stash from "./Stash";
 import Sheet from "./Sheet";
 import Store from "./Store";
 import Combat from "./Combat";
+import Home from "./Home";
 
 const Site = () => {
     const [csrf, setCsrf] = useState(null);
@@ -34,13 +35,10 @@ const Site = () => {
         <Router>
             <NavBar csrf={csrf}></NavBar>
             <Routes>
+                <Route exact path="/" element={<Home csrf={csrf} />} />
                 <Route exact path="/stash" element={<Stash csrf={csrf} />} />
                 <Route exact path="/store" element={<Store csrf={csrf} />} />
-                <Route
-                    exact
-                    path="/sheet"
-                    element={<Sheet csrf={csrf} />}
-                />
+                <Route exact path="/sheet" element={<Sheet csrf={csrf} />} />
                 <Route exact path="/combat" element={<Combat csrf={csrf} />} />
             </Routes>
         </Router>

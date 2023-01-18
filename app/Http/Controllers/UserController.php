@@ -238,18 +238,20 @@ class UserController extends Controller
         }
 
         $character = Auth::user()->character;
-        $character->talent_points = $character->level - 1;
+        if ($character->gold - round($character->level * 100 * 1.35) >= 0) {
+            $character->talent_points = $character->level - 1;
 
-        $character->strength = 10;
-        $character->dexterity = 10;
-        $character->magic = 10;
-        $character->vitality = 10;
-        $character->speed = 10;
+            $character->strength = 10;
+            $character->dexterity = 10;
+            $character->magic = 10;
+            $character->vitality = 10;
+            $character->speed = 10;
 
-        $character->gold = $character->gold - round($character->level * 100 * 1.35);
-        $character->maxHealth = $this->hpCalc($character->level, $character->vitality);
+            $character->gold = $character->gold - round($character->level * 100 * 1.35);
+            $character->maxHealth = $this->hpCalc($character->level, $character->vitality);
 
-        $character->save();
+            $character->save();
+        }
 
         return $this->userStash();
     }
@@ -371,6 +373,7 @@ class UserController extends Controller
         }
 
         $character->gold += $item->price;
+        $character->totalGold = $character->totalGold + $item->price;
 
         $character->save();
         $item->delete();
@@ -442,9 +445,10 @@ class UserController extends Controller
                 'vitality' => $stats[3],
                 'speed' => $stats[4],
 
-                'damage' => floor(floor($level / 5) + 3 * (1.4 * $stats[$key_ability_index])),
+                'damage' => floor(floor($level) + 3 * (1.4 * $stats[$key_ability_index])),
                 //Warning: Enemynek elég akkor csak majd a damage variance, hogy meglegyen a végső damage
 
+                'file_path' => $template['file_path'],
                 'hp' => $health,
             ];
         }
@@ -565,10 +569,35 @@ class UserController extends Controller
         $results['player_data'] = $player;
         $results['monster_data'] = $monster;
         $results['turn_count'] = $turn;
+        if ($results['won'] == 'player') {
+            $results['gold'] = $monster['level'] * 10;
+            $results['exp'] = rand($player['level'] * 10 * ceil($player['level'] / 10), round($player['level'] * 10 * ceil($player['level'] / 10) * 1.2));
+
+
+            $character->gold = $character->gold + $results['gold'];
+            $character->totalGold = $character->totalGold + $results['gold'];
+            $character->totalBattles = $character->totalBattles + 1;
+            $character->totalBattlesWon = $character->totalBattlesWon + 1;
+
+            if ($character->exp >= $this->expCapCalc($character->level)) {
+                $character->level = $character->level + 1;
+            }
+
+            $character->exp = $character->exp + $results['exp'];
+            $character->save();
+        } else {
+            $results['gold'] = 0;
+            $results['exp'] = 0;
+
+
+            $character->totalBattles = $character->totalBattles + 1;
+            $character->save();
+        }
+
 
         return response()->json(['combat_data' => $results], 200);
     }
-    public function attack($attacker,$attacked, $damageReduction)
+    public function attack($attacker, $attacked, $damageReduction)
     {
         $toHit_attacked = rand(0, 100);
         $toHit_attacker = rand(0, 100);
@@ -645,5 +674,21 @@ class UserController extends Controller
         }
 
         return ($maxHealth + $vit_health);
+    }
+
+    public function expCapCalc($level)
+    {
+        $previous_level = 0;
+        $next_level = 0;
+        $level_gap = 250;
+        for ($e = 1; $e < $level; $e++) {
+            $previous_level = $next_level;
+
+            if ($e % 10 == 0) {
+                $level_gap = $level_gap + round(300 * 1.5 ^ floor($level / 10));
+            }
+            $next_level = $next_level + $level_gap;
+        }
+        return $next_level;
     }
 }

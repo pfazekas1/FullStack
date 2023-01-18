@@ -33,7 +33,7 @@ const NavBar = ({ csrf }) => {
                     <AllInclusiveIcon />
                 </IconButton>
                 <Typography variant="h6" component='div' sx={{ flexGrow: 1 }}>
-                    Alma
+                    Paper Souls
                 </Typography>
 
                 <Stack direction='row' spacing={2}>

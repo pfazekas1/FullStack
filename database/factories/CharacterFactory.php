@@ -79,7 +79,11 @@ class CharacterFactory extends Factory
 
             'gold' => $this->faker->numberBetween(100, 8000),
 
-            'store_timer' => $this->faker->dateTimeBetween('-2 hour', '+2 hour')
+            'store_timer' => $this->faker->dateTimeBetween('-2 hour', '+2 hour'),
+
+            "totalGold" => $this->faker->numberBetween(0, 250),
+            "totalBattles" => $this->faker->numberBetween(0, 250),
+            "totalBattlesWon" => $this->faker->numberBetween(0, 250),
 
         ];
     }

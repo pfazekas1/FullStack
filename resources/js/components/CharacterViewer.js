@@ -2,11 +2,13 @@ import { List, ListItem, ListItemText, Paper, Typography } from "@mui/material";
 import { auto } from "@popperjs/core";
 import "bootstrap/dist/css/bootstrap.css";
 import { useEffect, useState } from "react";
+import EquipmentViewer from "./EquipmentViewer";
 
 const CharacterViewer = ({
     character,
     stash,
     equiped_ids,
+    types,
     temp_e_ids,
     temp,
 }) => {
@@ -15,7 +17,11 @@ const CharacterViewer = ({
         parseInt(character.dexterity) + getStats("dex"),
         parseInt(character.magic) + getStats("mag"),
     ]);
-
+    const stashSearch = (searchedId) => {
+        return stash.findIndex((el) => {
+            return el.id == searchedId;
+        });
+    };
     const arrowRender = (upOrDown) => {
         if (upOrDown)
             return (
@@ -146,10 +152,13 @@ const CharacterViewer = ({
 
     return (
         <Paper>
-            <img
-                width={200}
-                src="https://previews.123rf.com/images/byronwmoore/byronwmoore0712/byronwmoore071200012/2272083-3d-render-of-a-stick-man.jpg"
-            />
+            <EquipmentViewer
+                stashSearch={stashSearch}
+                character={character}
+                stash={stash}
+                equiped_ids={equiped_ids}
+                types={types}
+            ></EquipmentViewer>
             <List>
                 <ListItem>
                     <Typography style={compareStats("str", temp)}>

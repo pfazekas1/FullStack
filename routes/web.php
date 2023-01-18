@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/testing', function () {
-    return view('test');
+Route::get('/', function () {
+    return view('home');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -25,15 +25,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api/csrf', [UserController::class, 'authCsrf'])->name(
         'user.csrf'
     );
-
-    Route::get('/character', function () {
-        return view('home');
-    });
-
-
-    /*TODO: Föntiek átrendezése */
-
-
     Route::get('/stash', function () {
         return view('home');
     });
@@ -43,7 +34,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/combat', function () {
         return view('home');
     });
-
+    Route::get('/character', function () {
+        return view('home');
+    });
     Route::get('/sheet', function () {
         return view('home');
     });

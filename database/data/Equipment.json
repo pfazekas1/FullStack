@@ -4,27 +4,27 @@
         "equipmentType": "armor",
         "placementType": "body",
         "key_ability": "",
-        "file_path": ""
+        "file_path": "chainmail.png"
     },
     {
         "name": "Leather Cap",
         "equipmentType": "armor",
         "placementType": "head",
         "key_ability": "",
-        "file_path": ""
+        "file_path": "cap.png"
     },
     {
         "name": "Leather Boots",
         "equipmentType": "armor",
         "placementType": "legs",
         "key_ability": "",
-        "file_path": ""
+        "file_path": "boots.png"
     },
     {
         "name": "Short Sword",
         "equipmentType": "weapon",
         "placementType": "weapon",
         "key_ability": "strength",
-        "file_path": ""
+        "file_path": "sword.png"
     }
 ]

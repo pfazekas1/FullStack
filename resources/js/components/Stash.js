@@ -297,7 +297,11 @@ const Stash = ({ csrf }) => {
                                                     <CardMedia
                                                         component="img"
                                                         height="140"
-                                                        image="IMAGE"
+                                                        image={
+                                                            data.types[
+                                                                i.type_id - 1
+                                                            ].file_path
+                                                        }
                                                         alt={
                                                             data.types[
                                                                 i.type_id - 1
@@ -432,6 +436,7 @@ const Stash = ({ csrf }) => {
                                         equiped_ids={data.equiped_ids}
                                         temp_e_ids={temp_e_ids}
                                         temp={temp}
+                                        types={data.types}
                                     />
                                     <IconButton
                                         size="large"

@@ -2,16 +2,16 @@
     {
         "name": "Cow",
         "key_ability": "strength",
-        "file_path": ""
+        "file_path": "cow.png"
     },
     {
         "name": "Petty_Thief",
         "key_ability": "dexterity",
-        "file_path": ""
+        "file_path": "thief.png"
     },
     {
         "name": "Beholder",
         "key_ability": "magic",
-        "file_path": ""
+        "file_path": "beholder.png"
     }
 ]
