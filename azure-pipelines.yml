@@ -4,12 +4,12 @@ trigger:
 - master
 
 steps:
-- script: npm i
+- script: npm install
   displayName: 'Installing dependencies'
-- script: ng build --configuration production --source-map=false --subresource-integrity --output-path=dist/full-stack
-  displayName: 'Building project'
-#- script: npm run-script build-prod
+#- script: ng build --configuration production --source-map=false --subresource-integrity --output-path=dist/full-stack
 #  displayName: 'Building project'
+- script: npm run build
+  displayName: 'Building project'
 - powershell:
     $version = (Get-Content .\version)
     echo "$version"
