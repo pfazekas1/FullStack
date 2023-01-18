@@ -37,6 +37,6 @@ steps:
   displayName: 'Create and Git commit new version'
 - powershell: |
     git remote set-url origin https://$(gitUserName):$(gitToken)@github.com/pfazekas1/FullStack.git
-    git fetch origin master
-    git push origin HEAD:master
+    git fetch origin main
+    git push origin HEAD:main
   displayName: 'Git push'
