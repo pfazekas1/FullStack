@@ -36,7 +36,7 @@ steps:
     git commit -m "[Bump] version to: ${newVersion} [***NO_CI***]"
   displayName: 'Create and Git commit new version'
 - powershell: |
-    git remote set-url origin https://$(gitUserName):$(gitToken)@github.com/sonico10/FullStack.git
+    git remote set-url origin https://$(gitUserName):$(gitToken)@github.com/pfazekas1/FullStack.git
     git fetch origin master
     git push origin HEAD:master
   displayName: 'Git push'
