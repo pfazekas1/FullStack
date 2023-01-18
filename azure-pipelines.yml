@@ -1,5 +1,5 @@
 trigger:
-- master
+- main
 
 steps:
 - script: npm install
