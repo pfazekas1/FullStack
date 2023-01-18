@@ -7,4 +7,6 @@ COPY . .
 
 EXPOSE 3000
 
-CMD [“npm”, “start”]
+#RUN [“npm”, “start”]
+
+CMD ["php", "artisan", "serve"]
