@@ -6,7 +6,7 @@ steps:
   displayName: 'Installing dependencies'
 #- script: ng build --configuration production --source-map=false --subresource-integrity --output-path=dist/full-stack
 #  displayName: 'Building project'
-- script: npm run build
+- script: npm run dev
   displayName: 'Building project'
 - powershell:
     $version = (Get-Content .\version)
