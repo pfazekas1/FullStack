@@ -5,7 +5,7 @@ WORKDIR /usr/src/docker-react-sample
 COPY package*.json ./
 COPY . .
 
-EXPOSE 3000
+EXPOSE 80
 
 #RUN [“npm”, “start”]
 
