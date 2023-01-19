@@ -86,7 +86,7 @@ class UserController extends Controller
 
         $oldTimer = Carbon::parse($character->store_timer);
 
-        if (Carbon::now()->gt($oldTimer->addHours(2))) {
+        if (Carbon::now()->gt($oldTimer)) {
 
 
             $oldStore = Stash::where(
@@ -392,7 +392,10 @@ class UserController extends Controller
 
         for ($i = 0; $i < 3; $i++) {
             $template = Arr::random($all_monsters->toArray());
+
             $level = rand($character->level - 5, $character->level + 5);
+            while ($level < 1)
+                $level = rand($character->level - 5, $character->level + 5);
             $stats = [10, 10, 10, 10, 10];
 
             $key_ability_index = $this->keyStat($template['key_ability']);
@@ -579,11 +582,12 @@ class UserController extends Controller
             $character->totalBattles = $character->totalBattles + 1;
             $character->totalBattlesWon = $character->totalBattlesWon + 1;
 
+            $character->exp = $character->exp + $results['exp'];
+
             if ($character->exp >= $this->expCapCalc($character->level)) {
                 $character->level = $character->level + 1;
+                $character->talent_points = $character->talent_points + 1;
             }
-
-            $character->exp = $character->exp + $results['exp'];
             $character->save();
         } else {
             $results['gold'] = 0;
@@ -681,10 +685,10 @@ class UserController extends Controller
         $previous_level = 0;
         $next_level = 0;
         $level_gap = 250;
-        for ($e = 1; $e < $level; $e++) {
+        for ($e = 0; $e < $level; $e++) {
             $previous_level = $next_level;
 
-            if ($e % 10 == 0) {
+            if ($e % 10 == 0 && $e != 0) {
                 $level_gap = $level_gap + round(300 * 1.5 ^ floor($level / 10));
             }
             $next_level = $next_level + $level_gap;

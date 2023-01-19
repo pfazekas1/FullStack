@@ -18,10 +18,10 @@ class CharacterFactory extends Factory
         $previous_level = 0;
         $next_level = 0;
         $level_gap = 250;
-        for ($e = 1; $e < $level; $e++) {
+        for ($e = 0; $e < $level; $e++) {
             $previous_level = $next_level;
 
-            if ($e % 10 == 0) {
+            if ($e % 10 == 0 && $e != 0) {
                 $level_gap = $level_gap + round(300 * 1.5 ^ floor($level / 10));
             }
             $next_level = $next_level + $level_gap;

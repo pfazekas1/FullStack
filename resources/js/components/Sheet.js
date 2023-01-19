@@ -127,10 +127,10 @@ const Sheet = ({ csrf }) => {
         let previous_level = 0;
         let next_level = 0;
         let level_gap = 250;
-        for (let e = 1; e < level; e++) {
+        for (let e = 0; e < level; e++) {
             previous_level = next_level;
 
-            if (e % 10 == 0) {
+            if (e % 10 == 0 && e != 0) {
                 level_gap =
                     level_gap +
                     Math.round((300 * 1.5) ^ Math.floor(level / 10));

@@ -55,11 +55,23 @@ class RegisteredUserController extends Controller
         Character::factory()->create([
             'user_id' => $user->id,
             'level' => 1,
+
             'strength' => 10,
             'dexterity' => 10,
             'magic' => 10,
+            'vitality' => 10,
+            'speed' => 10,
+
             'health' => 10,
-            'maxHealth' => 100,
+            'maxHealth' => 200,
+            
+            'talent_points' => 0,
+            'exp' => 0,
+
+            "totalGold" => 0,
+            "totalBattles" => 0,
+            "totalBattlesWon" => 0,
+
             'gold' => 100,
             'headId' => null,
             'bodyId' => null,
@@ -71,6 +83,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(RouteServiceProvider::HOME);
+        return redirect("/");
     }
 }
